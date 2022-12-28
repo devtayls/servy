@@ -1,0 +1,31 @@
+{
+	"folders": [
+		{
+			"name": "servy",
+			"path": "."
+		},
+		{
+			"name": "pragstudio-elixir-code 2",
+			"path": "../../Downloads/pragstudio-elixir-code 2"
+		},
+		{
+			"path": "../houston"
+		},
+		{
+			"path": "../portal.pdq.com"
+		}
+	],
+	"settings": {
+		"cSpell.words": [
+			"chakra",
+			"conv",
+			"LINKEDIN"
+		],
+		"files.autoSave": "afterDelay",
+		"editor.formatOnPaste": true,
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "JakeBecker.elixir-ls",
+		"elixirLS.enableTestLenses": true,
+		"elixirLS.trace.server": "messages"
+	}
+}
