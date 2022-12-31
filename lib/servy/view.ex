@@ -1,6 +1,5 @@
 defmodule Servy.View do
-  @templates_path Path.expand("templates", File.cwd!)
-
+  @templates_path Path.expand("templates", File.cwd!())
 
   def render(conv, template, bindings \\ []) do
     content =
@@ -8,6 +7,6 @@ defmodule Servy.View do
       |> Path.join(template)
       |> EEx.eval_file(bindings)
 
-    %{ conv | status: 200, resp_body: content}
+    %{conv | status: 200, resp_body: content}
   end
 end
