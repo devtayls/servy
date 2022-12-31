@@ -24,3 +24,6 @@ servy-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# Workspace
+elixir.code-Workspace
