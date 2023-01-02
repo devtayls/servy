@@ -21,6 +21,7 @@ defmodule Servy.Handler do
     |> normalize_path_params
     |> log
     |> route
+    |> put_content_length
     |> track
     |> format_response
   end
@@ -50,6 +51,10 @@ defmodule Servy.Handler do
     %{conv | status: 200, resp_body: "Bears, Lions, Tigers"}
   end
 
+  def route(%Conv{method: "GET", path: "/api/bears"} = conv) do
+    Servy.Api.BearController.index(conv)
+  end
+
   def route(%Conv{method: "GET", path: "/bears"} = conv) do
     BearController.index(conv)
   end
@@ -72,11 +77,27 @@ defmodule Servy.Handler do
     %{conv | status: 404, resp_body: "No route for #{path}"}
   end
 
+  def put_resp_content_type(%Conv{} = conv, content_type) do
+    %{conv | resp_headers: Map.put(conv.resp_headers, "Content-Type", content_type)}
+  end
+
+  def put_content_length(%Conv{} = conv) do
+    %{
+      conv
+      | resp_headers: Map.put(conv.resp_headers, "Content-Length", byte_size(conv.resp_body))
+    }
+  end
+
+  def format_response_headers(%Conv{} = conv) do
+    Enum.map(conv.resp_headers, fn {key, value} -> "#{key}: #{value}" end)
+    |> Enum.sort(:desc)
+    |> Enum.join("\r")
+  end
+
   def format_response(%Conv{} = conv) do
     """
     HTTP/1.1 #{Conv.full_status(conv)}\r
-    Content-Type: text/html\r
-    Content-Length: #{byte_size(conv.resp_body)}\r
+    #{format_response_headers(conv)}
     \r
     #{conv.resp_body}
     """
@@ -88,120 +109,6 @@ end
 # Host: example.com
 # User-Agent: ExampleBrowser/1.0
 # Accept: */*
-# """
-
-# response = Servy.Handler.handle(request)
-
-# IO.puts response
-
-# request = """
-# GET /bears HTTP/1.1
-# Host: example.com
-# User-Agent: ExampleBrowser/1.0
-# Accept: */*
-
-# """
-
-# response = Servy.Handler.handle(request)
-
-# IO.puts(response)
-
-# request = """
-# GET /bigfoot HTTP/1.1
-# Host: example.com
-# User-Agent: ExampleBrowser/1.0
-# Accept: */*
-# """
-
-# response = Servy.Handler.handle(request)
-
-# IO.puts response
-
-# IO.puts("GET /bears/1")
-
-# request = """
-# GET /bears/1 HTTP/1.1
-# Host: example.com
-# User-Agent: ExampleBrowser/1.0
-# Accept: */*
-
-# """
-
-# response = Servy.Handler.handle(request)
-
-# IO.puts(response)
-
-# request = """
-# DELETE /bears/1 HTTP/1.1
-# Host: example.com
-# User-Agent: ExampleBrowser/1.0
-# Accept: */*
-
-# """
-
-# response = Servy.Handler.handle(request)
-
-# IO.puts(response)
-
-# request = """
-# GET /wildlife HTTP/1.1
-# Host: example.com
-# User-Agent: ExampleBrowser/1.0
-# Accept: */*
-
-# """
-
-# response = Servy.Handler.handle(request)
-
-# IO.puts(response)
-
-# request = """
-# GET /bears?id=1 HTTP/1.1
-# Host: example.com
-# User-Agent: ExampleBrowser/1.0
-# Accept: */*
-
-# """
-
-# response = Servy.Handler.handle(request)
-
-# IO.puts(response)
-
-# request = """
-# GET /about HTTP/1.1
-# Host: example.com
-# User-Agent: ExampleBrowser/1.0
-# Accept: */*
-
-# """
-
-# response = Servy.Handler.handle(request)
-
-# IO.puts(response)
-
-# request = """
-# GET /bears/new HTTP/1.1
-# Host: example.com
-# User-Agent: ExampleBrowser/1.0
-# Accept: */*
-
-# """
-
-# response = Servy.Handler.handle(request)
-
-# IO.puts(response)
-
-# IO.puts("POST /bears")
-
-# request = """
-# POST /bears HTTP/1.1
-# Host: example.com
-# User-Agent: ExampleBrowser/1.0
-# Accept: */*
-# Content-Type: application/x-www-form-urlencoded
-# Content-Length: 21
-
-# name=Baloo&type=Brown
 # """
 
 # response = Servy.Handler.handle(request)
