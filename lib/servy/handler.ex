@@ -55,6 +55,10 @@ defmodule Servy.Handler do
     Servy.Api.BearController.index(conv)
   end
 
+  def route(%Conv{method: "POST", path: "/api/bears"} = conv) do
+    Servy.Api.BearController.create(conv, conv.params)
+  end
+
   def route(%Conv{method: "GET", path: "/bears"} = conv) do
     BearController.index(conv)
   end
@@ -88,10 +92,12 @@ defmodule Servy.Handler do
     }
   end
 
-  def format_response_headers(%Conv{} = conv) do
-    Enum.map(conv.resp_headers, fn {key, value} -> "#{key}: #{value}" end)
+  defp format_response_headers(conv) do
+    Enum.map(conv.resp_headers, fn {key, value} ->
+      "#{key}: #{value}\r"
+    end)
     |> Enum.sort(:desc)
-    |> Enum.join("\r")
+    |> Enum.join("\n")
   end
 
   def format_response(%Conv{} = conv) do
@@ -102,6 +108,16 @@ defmodule Servy.Handler do
     #{conv.resp_body}
     """
   end
+
+  # def format_response(%Conv{} = conv) do
+  #   """
+  #   HTTP/1.1 #{Conv.full_status(conv)}\r
+  #   Content-Type: #{conv.resp_content_type}\r
+  #   Content-Length: #{String.length(conv.resp_body)}\r
+  #   \r
+  #   #{conv.resp_body}
+  #   """
+  # end
 end
 
 # request = """
