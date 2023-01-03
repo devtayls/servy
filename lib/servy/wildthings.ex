@@ -1,19 +1,40 @@
 defmodule Servy.Wildthings do
   alias Servy.Bear
 
+  # def list_bears do
+  #   [
+  #     %Bear{id: 1, name: "Teddy", type: "Brown", hibernating: true},
+  #     %Bear{id: 2, name: "Smokey", type: "Black"},
+  #     %Bear{id: 3, name: "Paddington", type: "Brown"},
+  #     %Bear{id: 4, name: "Scarface", type: "Grizzly", hibernating: true},
+  #     %Bear{id: 5, name: "Snow", type: "Polar"},
+  #     %Bear{id: 6, name: "Brutus", type: "Grizzly"},
+  #     %Bear{id: 7, name: "Rosie", type: "Black", hibernating: true},
+  #     %Bear{id: 8, name: "Roscoe", type: "Panda"},
+  #     %Bear{id: 9, name: "Iceman", type: "Polar", hibernating: true},
+  #     %Bear{id: 10, name: "Kenai", type: "Grizzly"}
+  #   ]
+  # end
+
+  @db_path Path.expand("db", File.cwd!())
   def list_bears do
-    [
-      %Bear{id: 1, name: "Teddy", type: "Brown", hibernating: true},
-      %Bear{id: 2, name: "Smokey", type: "Black"},
-      %Bear{id: 3, name: "Paddington", type: "Brown"},
-      %Bear{id: 4, name: "Scarface", type: "Grizzly", hibernating: true},
-      %Bear{id: 5, name: "Snow", type: "Polar"},
-      %Bear{id: 6, name: "Brutus", type: "Grizzly"},
-      %Bear{id: 7, name: "Rosie", type: "Black", hibernating: true},
-      %Bear{id: 8, name: "Roscoe", type: "Panda"},
-      %Bear{id: 9, name: "Iceman", type: "Polar", hibernating: true},
-      %Bear{id: 10, name: "Kenai", type: "Grizzly"}
-    ]
+    @db_path
+    |> Path.join("bears.json")
+    |> read_json()
+    |> Poison.decode!(as: %{"bears" => [%Bear{}]})
+    |> IO.inspect()
+    |> Map.get("bears")
+  end
+
+  defp read_json(source) do
+    case File.read(source) do
+      {:ok, contents} ->
+        contents
+
+      {:error, reason} ->
+        IO.inspect("Error reading #{source}: #{reason}")
+        "[]"
+    end
   end
 
   @spec get_bear(integer) :: any
