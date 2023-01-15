@@ -18,6 +18,6 @@ defmodule Servy.Recurse do
   def triple([]), do: []
 end
 
-num = Servy.Recurse.loopy([1, 2, 3, 4, 5], 0)
+# num = Servy.Recurse.loopy([1, 2, 3, 4, 5], 0)
 
-IO.inspect(num)
+# IO.inspect(num)

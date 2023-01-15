@@ -26,6 +26,20 @@ defmodule Servy.Handler do
     |> format_response
   end
 
+  def route(%Conv{method: "GET", path: "/kaboom"} = _conv) do
+    raise "Kaboom!"
+  end
+
+  def route(%Conv{method: "GET", path: "/hibernate/" <> time} = conv) do
+    Logger.info("Hibernating for #{time} seconds")
+
+    time
+    |> String.to_integer()
+    |> :timer.sleep()
+
+    %{conv | status: 200, resp_body: "I'm awake!"}
+  end
+
   def route(%Conv{method: "GET", path: "/pages/" <> file} = conv) do
     @pages_path
     |> Path.join(file <> ".html")
