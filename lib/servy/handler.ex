@@ -7,6 +7,7 @@ defmodule Servy.Handler do
 
   alias Servy.Conv
   alias Servy.BearController
+  alias Servy.VideoCam
 
   import Servy.Plugins, only: [rewrite_path: 1, normalize_path_params: 1, log: 1, track: 1]
   import Servy.Parser, only: [parse: 1]
@@ -24,6 +25,21 @@ defmodule Servy.Handler do
     |> put_content_length
     |> track
     |> format_response
+  end
+
+  def route(%Conv{method: "GET", path: "/snapshots"} = conv) do
+    caller = self()
+
+    spawn(fn -> send(caller, {:result, VideoCam.get_snapshot("cam-1")}) end)
+
+    snapshot1 =
+      receive do
+        {:result, filename} -> filename
+      end
+
+    snapshots = [snapshot1]
+
+    %{conv | status: 200, resp_body: inspect(snapshots)}
   end
 
   def route(%Conv{method: "GET", path: "/kaboom"} = _conv) do
