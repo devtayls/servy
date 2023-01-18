@@ -1,0 +1,7 @@
+<h1>Pledges!</h1>
+
+<ul>
+<%= for pledge <- pledges do %>
+    <li><%= elem(pledge, 0) %> pledged <%= elem(pledge, 1) %></li>
+<%= end %>
+</ul>
