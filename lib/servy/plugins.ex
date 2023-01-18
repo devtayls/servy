@@ -2,6 +2,7 @@ defmodule Servy.Plugins do
   require Logger
 
   alias Servy.Conv
+  alias Servy.FourOhFourCounter
 
   def rewrite_path(%{path: "/wildlife"} = conv) do
     %{conv | path: "/wildthings"}
@@ -24,7 +25,7 @@ defmodule Servy.Plugins do
     if Mix.env() !== :test do
       Logger.warn("No route for #{path}")
     end
-
+    Servy.FourOhFourCounter.count_404(path)
     conv
   end
 
