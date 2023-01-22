@@ -8,6 +8,7 @@ defmodule Servy.Handler do
   alias Servy.Conv
   alias Servy.BearController
   alias Servy.VideoCam
+  alias Servy.SensorServer
 
   import Servy.Plugins, only: [rewrite_path: 1, normalize_path_params: 1, log: 1, track: 1]
   import Servy.Parser, only: [parse: 1]
@@ -58,6 +59,12 @@ defmodule Servy.Handler do
     snapshots = [snapshot1]
 
     %{conv | status: 200, resp_body: inspect(snapshots)}
+  end
+
+  def route(%Conv{method: "GET", path: "/sensors"} = conv) do
+    sensor_data = Servy.SensorServer.get_sensor_data()
+
+    %{conv | status: 200, resp_body: inspect(sensor_data)}
   end
 
   def route(%Conv{method: "GET", path: "/kaboom"} = _conv) do

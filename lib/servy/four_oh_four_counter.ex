@@ -3,7 +3,7 @@ defmodule Servy.FourOhFourCounter do
 
   @name :four_oh_four_counter
 
-  def start() do
+  def start_link(_arg) do
     IO.puts("Starting FourOhFourCounter")
     GenServer.start(__MODULE__, %{}, name: @name)
   end

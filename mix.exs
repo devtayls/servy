@@ -7,14 +7,17 @@ defmodule Servy.MixProject do
       version: "0.1.0",
       elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      description: "A web server, not guaranteed to serve requests."
     ]
   end
 
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :eex]
+      extra_applications: [:logger, :eex],
+      mod: {Servy, []},
+      env: [port: 3000]
     ]
   end
 
