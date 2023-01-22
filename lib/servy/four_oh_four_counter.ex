@@ -1,62 +1,47 @@
 defmodule Servy.FourOhFourCounter do
+  use GenServer
+
   @name :four_oh_four_counter
 
-  def start do
+  def start() do
     IO.puts("Starting FourOhFourCounter")
-    pid = spawn(__MODULE__, :listen_loop, [%{}])
-
-    Process.register(pid, :four_oh_four_counter)
-
-    pid
+    GenServer.start(__MODULE__, %{}, name: @name)
   end
 
+  @spec count_404(any) :: any
   def count_404(path) do
-    send(@name, {self(), :count_404, path})
+    GenServer.cast(@name, {:count_404, path})
+  end
 
-    receive do
-      {:count_404, value} -> value
-    end
+  def reset() do
+    GenServer.cast(@name, :reset)
   end
 
   def get_counts() do
-    send(@name, {self(), :get_counts})
-
-    receive do
-      {:get_counts, counts} -> counts
-    end
+    GenServer.call(@name, :get_counts)
   end
 
   def get_count(path) do
-    send(@name, {self(), :get_count, path})
-
-    receive do
-      {:get_count, value} -> value
-    end
+    GenServer.call(@name, {:get_count, path})
   end
 
   # Server
 
-  def listen_loop(state) do
-    receive do
-      {sender, :count_404, path} ->
-        new_state = Map.update(state, path, 1, fn count -> count + 1 end)
-        # increase the count
-        send(sender, {:count_404, Map.get(new_state, path)})
+  def handle_cast({:count_404, path}, state) do
+    new_state = Map.update(state, path, 1, fn count -> count + 1 end)
+    {:noreply, new_state}
+  end
 
-        listen_loop(new_state)
+  def handle_cast(:reset, _state) do
+    {:noreply, %{}}
+  end
 
-      {sender, :get_counts} ->
-        send(sender, {:get_counts, state})
-        listen_loop(state)
+  def handle_call(:get_counts, _from, state) do
+    {:reply, state, state}
+  end
 
-      {sender, :get_count, path} ->
-        count = Map.get(state, path, 0)
-        send(sender, {:get_count, count})
-        listen_loop(state)
-
-      unexpected ->
-        IO.puts("Unexpected message: #{inspect(unexpected)}")
-        listen_loop(state)
-    end
+  def handle_call({:get_count, path}, _from, state) do
+    count = Map.get(state, path, 0)
+    {:reply, count, state}
   end
 end
